@@ -1,0 +1,44 @@
+[
+  {
+    "id": "ta_tm_maram",
+    "language": "ta",
+    "targetWord": "மரம்",
+    "sillyClaim": "மிண்டி சொல்கிறது: மரம் என்றால்... ம்ம்ம்... பூனையா? 🐱",
+    "prompt": "மரம் என்றால் என்னவென்று மிண்டிக்கு சொல்லிக் கொடுக்கலாமா?",
+    "options": [
+      { "id": "opt_1", "label": "நிழல் தரும் மரம்", "emoji": "🌳", "isCorrect": true },
+      { "id": "opt_2", "label": "மியாவ் பூனை", "emoji": "🐱", "isCorrect": false },
+      { "id": "opt_3", "label": "நீந்தும் மீன்", "emoji": "🐟", "isCorrect": false }
+    ],
+    "meaning": "பசுமையான இலைகளுடன் குளிர்ந்த நிழல் தரும் மரம்",
+    "difficulty": 1
+  },
+  {
+    "id": "ta_tm_kili",
+    "language": "ta",
+    "targetWord": "கிளி",
+    "sillyClaim": "மிண்டி சொல்கிறது: கிளி பழங்களை தின்னாமல் கற்களை தின்னுமா? 🪨",
+    "prompt": "கிளி என்ன சாப்பிடும் என்று மிண்டிக்கு சொல்லிக் கொடுங்கள்!",
+    "options": [
+      { "id": "opt_1", "label": "பழங்கள் மற்றும் கொய்யா", "emoji": "🍉", "isCorrect": true },
+      { "id": "opt_2", "label": "கடினமான கற்கள்", "emoji": "🪨", "isCorrect": false },
+      { "id": "opt_3", "label": "காகித புத்தகங்கள்", "emoji": "📚", "isCorrect": false }
+    ],
+    "meaning": "சிவப்பு மூக்குடைய பழம் உண்ணும் பச்சைக்கிளி",
+    "difficulty": 1
+  },
+  {
+    "id": "ta_tm_mayil",
+    "language": "ta",
+    "targetWord": "மயில்",
+    "sillyClaim": "மிண்டி சொல்கிறது: மயிலுக்கு தோகையே கிடையாது, அது வாத்து போல் கத்துமா? 🦆",
+    "prompt": "மயிலின் சிறப்பை மிண்டிக்கு கற்பிக்கலாமா?",
+    "options": [
+      { "id": "opt_1", "label": "தோகை விரித்து ஆடும்", "emoji": "🦚", "isCorrect": true },
+      { "id": "opt_2", "label": "வாத்து போல் நீந்தும்", "emoji": "🦆", "isCorrect": false },
+      { "id": "opt_3", "label": "நாய்க்குட்டி போல் குரைக்கும்", "emoji": "🐶", "isCorrect": false }
+    ],
+    "meaning": "மழைக்காலத்தில் தோகை விரித்து ஆடும் அழகிய பறவை",
+    "difficulty": 1
+  }
+]

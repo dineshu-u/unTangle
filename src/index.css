@@ -1,0 +1,133 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/assets/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'OpenDyslexic';
+  src: url('/assets/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+:root {
+  --font-dyslexic: 'OpenDyslexic', 'Lexend', 'Comic Neue', sans-serif;
+  --font-tamil: 'Noto Sans Tamil', sans-serif;
+  --font-child: 'Fredoka', 'Quicksand', system-ui, sans-serif;
+}
+
+.font-dyslexic {
+  font-family: var(--font-dyslexic);
+  letter-spacing: 0.05em;
+  word-spacing: 0.1em;
+}
+
+.font-tamil {
+  font-family: var(--font-tamil);
+  letter-spacing: 0.02em;
+}
+
+.font-child {
+  font-family: var(--font-child);
+}
+
+/* Hide scrollbar for clean horizontal tab bars */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+/* Custom scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(0,0,0,0.05);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(0,0,0,0.2);
+  border-radius: 10px;
+}
+
+/* ==========================================================================
+   Responsive Layout Styles with @media queries for Phones, Tablets & Desktops
+   ========================================================================== */
+
+/* 1. Mobile Phones (< 640px) */
+@media (max-width: 640px) {
+  .app-container {
+    width: 100% !important;
+    max-width: 100% !important;
+    border-left-width: 0 !important;
+    border-right-width: 0 !important;
+    box-shadow: none !important;
+  }
+  
+  .parent-grid-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.5rem !important;
+  }
+
+  .parent-tab-btn {
+    padding-left: 0.5rem !important;
+    padding-right: 0.5rem !important;
+    font-size: 10px !important;
+  }
+}
+
+/* 2. Tablets (641px to 1024px) */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .app-container {
+    width: 100% !important;
+    max-width: 680px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    border-left-width: 1px !important;
+    border-right-width: 1px !important;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04) !important;
+  }
+
+  .parent-grid-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  .parent-tab-btn {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+    font-size: 12px !important;
+  }
+}
+
+/* 3. Desktops (>= 1025px) */
+@media (min-width: 1025px) {
+  .app-container {
+    width: 100% !important;
+    max-width: 768px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    border-left-width: 1px !important;
+    border-right-width: 1px !important;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .parent-grid-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+
+  .parent-tab-btn {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+    font-size: 13px !important;
+  }
+}
