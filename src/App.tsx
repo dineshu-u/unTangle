@@ -67,19 +67,19 @@ export const App: React.FC = () => {
 
   return (
     <div
-      className={`min-h-screen w-full bg-stone-100 flex flex-col items-center justify-start text-slate-800 ${activeFontClass}`}
+      className={`h-screen h-[100dvh] w-full bg-stone-100 flex flex-col items-center justify-start text-slate-800 overflow-hidden select-none ${activeFontClass}`}
     >
       {/* Responsive Web Container with @media queries for Mobile and Tablets */}
-      <div className="app-container w-full min-h-screen bg-amber-50/50 flex flex-col border-amber-200/60 relative mx-auto overflow-x-hidden">
-        {/* Mobile Sticky Top Status Bar */}
+      <div className="app-container w-full h-full h-[100dvh] max-h-[100dvh] bg-amber-50/50 flex flex-col border-amber-200/60 relative mx-auto overflow-hidden">
+        {/* Mobile Fixed Top Status Bar */}
         <TopStatusBar onOpenParentGate={() => setIsParentGateOpen(true)} />
 
-        {/* Main Content Body */}
-        <main className="flex-1 flex flex-col overflow-y-auto">
+        {/* Main Content Body: Takes remaining viewport space, scrolls internally if needed */}
+        <main className="flex-1 min-h-0 w-full flex flex-col overflow-y-auto overflow-x-hidden">
           {renderActiveScreen()}
         </main>
 
-        {/* Mobile Sticky Bottom Navigation (in child mode) */}
+        {/* Mobile Fixed Bottom Navigation (in child mode): Pinned at bottom, always 100% visible! */}
         {appMode === 'child' && <ChildBottomNav />}
       </div>
 

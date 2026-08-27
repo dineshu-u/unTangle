@@ -1,4 +1,4 @@
-import { TeachMindyService, REALISTIC_TEACH_MINDY_EN } from '../src/services/teachMindyService';
+import { TeachMindyService } from '../src/services/teachMindyService';
 
 console.log('=== TEACH MINDY SEQUENTIAL PROGRESSION & 3-SECOND DELAY TEST ===\n');
 

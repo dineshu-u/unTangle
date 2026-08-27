@@ -291,9 +291,9 @@ export const MindyHouseView: React.FC = () => {
           </div>
 
           {/* Mindy Avatar in Frame */}
-          <div className="flex justify-center mb-2">
+          <div className="flex justify-center mb-1.5">
             <div className="relative">
-              <div className="w-22 h-22 sm:w-26 sm:h-26 rounded-full bg-sky-100 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
+              <div className="w-20 h-20 sm:w-26 sm:h-26 rounded-full bg-sky-100 border-4 border-white shadow-md flex items-center justify-center overflow-hidden">
                 <MindyAvatar mood={mindyMood} size="lg" onClick={speakPrompt} />
               </div>
               <span className="absolute -bottom-1 -right-1 bg-amber-400 text-amber-950 text-[10px] font-black px-2 py-0.5 rounded-full border border-white shadow-xs">
@@ -303,11 +303,11 @@ export const MindyHouseView: React.FC = () => {
           </div>
 
           {/* Dialogue Box */}
-          <div className="bg-white/95 rounded-2xl p-3.5 shadow-xs border border-amber-100 mb-4 text-center">
-            <p className="text-sm sm:text-base font-bold text-slate-800 leading-relaxed">
+          <div className="bg-white/95 rounded-2xl p-2.5 sm:p-3.5 shadow-xs border border-amber-100 mb-2.5 text-center">
+            <p className="text-xs sm:text-base font-bold text-slate-800 leading-relaxed">
               {currentScenario.sillyClaim}
             </p>
-            <p className="text-xs sm:text-sm font-medium text-slate-600 mt-2">
+            <p className="text-[11px] sm:text-sm font-medium text-slate-600 mt-1">
               {currentScenario.prompt}
             </p>
             {speechText && (
@@ -324,7 +324,7 @@ export const MindyHouseView: React.FC = () => {
           </div>
 
           {/* 3 Options Grid: completely neutral until clicked; locks on answer; no pre-checked markers */}
-          <div className="grid grid-cols-3 gap-2 mb-3">
+          <div className="grid grid-cols-3 gap-2 mb-2.5">
             {currentScenario.options.map((opt, idx) => {
               const isSelected = selectedOptionId === opt.id;
               const showCorrect = isSuccess && opt.isCorrect;
@@ -335,7 +335,7 @@ export const MindyHouseView: React.FC = () => {
                   key={`tm_q${scenarioIndex}_${opt.id}_${idx}`}
                   disabled={isAnswerLocked || isAiGenerating}
                   onClick={() => handleSelectOption(opt.id, opt.isCorrect)}
-                  className={`relative p-2.5 rounded-2xl border-2 flex flex-col items-center justify-between transition-all duration-200 active:scale-95 shadow-xs min-h-[96px] ${
+                  className={`relative p-2 sm:p-2.5 rounded-2xl border-2 flex flex-col items-center justify-between transition-all duration-200 active:scale-95 shadow-xs min-h-[82px] sm:min-h-[96px] ${
                     showCorrect
                       ? 'bg-emerald-500 text-white border-emerald-600 ring-2 ring-emerald-200 scale-102 shadow-md'
                       : showWrong
@@ -346,7 +346,7 @@ export const MindyHouseView: React.FC = () => {
                   }`}
                 >
                   <span className="text-2xl sm:text-3xl">{opt.emoji}</span>
-                  <span className={`text-[11px] sm:text-xs font-bold text-center leading-tight mt-1 ${showCorrect ? 'text-white' : 'text-slate-800'}`}>
+                  <span className={`text-[10px] sm:text-xs font-bold text-center leading-tight mt-1 ${showCorrect ? 'text-white' : 'text-slate-800'}`}>
                     {opt.label}
                   </span>
 

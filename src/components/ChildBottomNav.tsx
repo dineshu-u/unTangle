@@ -46,7 +46,7 @@ export const ChildBottomNav: React.FC = () => {
   };
 
   return (
-    <nav className="sticky bottom-0 w-full bg-white/95 backdrop-blur-md border-t border-amber-200/80 px-2 py-1.5 z-30 shadow-lg select-none">
+    <nav className="shrink-0 w-full bg-white/95 backdrop-blur-md border-t border-amber-200/80 px-2 pt-1 pb-[max(0.375rem,env(safe-area-inset-bottom))] z-30 shadow-lg select-none">
       <div className="flex items-center justify-around max-w-md mx-auto">
         {navItems.map((item) => {
           const isActive = currentScreen === item.id;

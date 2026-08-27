@@ -42,7 +42,7 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onOpenParentGate }) 
 
   return (
     <>
-      <header className="sticky top-0 w-full bg-white/95 backdrop-blur-md border-b border-amber-200/80 px-2 sm:px-3 py-1.5 sm:py-2 select-none z-30 shadow-xs">
+      <header className="shrink-0 w-full bg-white/95 backdrop-blur-md border-b border-amber-200/80 px-2 sm:px-3 py-1.5 sm:py-2 select-none z-30 shadow-xs">
         <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
           {/* Left: Active Learner Profile & Level */}
           <button

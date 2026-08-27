@@ -184,7 +184,7 @@ export const VillageHomeView: React.FC = () => {
 
       {/* VIEW MODE 1: LIVING STORYBOOK MAP */}
       {viewMode === 'map' && (
-        <div className="relative w-full flex-1 min-h-[540px] sm:min-h-[600px] bg-[#97c75c] overflow-hidden select-none">
+        <div className="relative w-full flex-1 min-h-0 h-full bg-[#97c75c] overflow-hidden select-none">
           {/* Storybook Village Art Backdrop */}
           <div className="absolute inset-0 z-0">
             <img
