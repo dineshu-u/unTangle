@@ -3,6 +3,7 @@ import { useApp } from './context/AppContext';
 import { TopStatusBar } from './components/TopStatusBar';
 import { ChildBottomNav } from './components/ChildBottomNav';
 import { ParentGateModal } from './components/ParentGateModal';
+import { LoginView } from './features/parent/LoginView';
 
 // Feature Views
 import { VillageHomeView } from './features/child/VillageHomeView';
@@ -23,17 +24,34 @@ export const App: React.FC = () => {
     setAppMode,
     currentScreen,
     useDyslexicFont,
+    isLoggedIn,
+    signInUser,
   } = useApp();
 
   const [isParentGateOpen, setIsParentGateOpen] = useState(false);
 
-  // Pure font isolation: Tamil uses Noto Sans Tamil; English uses OpenDyslexic / Lexend
+  // App shows login page FIRST on initial launch
+  if (!isLoggedIn) {
+    return (
+      <LoginView
+        onLogin={(account) => {
+          signInUser(account);
+        }}
+      />
+    );
+  }
+
+  // Pure font isolation:
+  // Default: useDyslexicFont is true
+  //   - Tamil mode uses 'font-tamil-dyslexic' (UntangleTamil from assets, NO Noto Sans Tamil)
+  //   - English mode uses 'font-dyslexic' (OpenDyslexic)
+  // When explicitly turned off by parents in settings:
+  //   - Tamil mode uses 'font-tamil-standard' (Noto Sans Tamil)
+  //   - English mode uses 'font-child'
   const activeFontClass =
     language === 'ta'
-      ? 'font-tamil'
-      : useDyslexicFont
-      ? 'font-dyslexic'
-      : 'font-child';
+      ? (useDyslexicFont ? 'font-tamil-dyslexic' : 'font-tamil-standard')
+      : (useDyslexicFont ? 'font-dyslexic' : 'font-child');
 
   const renderActiveScreen = () => {
     if (appMode === 'parent') {

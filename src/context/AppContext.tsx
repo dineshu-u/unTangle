@@ -4,11 +4,13 @@ import { ChildProgressState, LessonCardRecord } from '../domain/models/progress'
 import { LearningEvent, ActivityType, LearningEventOutcome } from '../domain/models/learningEvent';
 import { MindyResponse, MindyEmotion } from '../domain/models/mindy';
 import { PlayerLearningProfile } from '../domain/models/playerProfile';
+import { UserAccount } from '../domain/models/userAccount';
 import { contentRepository, IContentRepository } from '../domain/repositories/ContentRepository';
 import { ProgressionService } from '../domain/progression/progressionService';
 import { AdaptiveEngine, AdaptiveRecommendation, ParentObservationSummary } from '../domain/adaptive/adaptiveEngine';
 import { ProgressStorageService, INITIAL_PROGRESS_STATE } from '../services/persistence/progressStorage';
 import { PlayerProfileStorage, PRESET_PLAYERS } from '../services/persistence/playerProfileStorage';
+import { UserAccountService } from '../services/persistence/userAccountService';
 import { LearningSummaryGenerator } from '../domain/adaptive/learningSummaryGenerator';
 import { contentGenerationService } from '../services/contentGenerationService';
 import { ApiKeyService } from '../services/apiKeyService';
@@ -39,6 +41,17 @@ interface AppContextType {
   currentScreen: ScreenId;
   setCurrentScreen: (screen: ScreenId) => void;
   
+  // User Account & Multi-User Separation (Primary Key = parentMobile)
+  currentUser: UserAccount | null;
+  registeredAccounts: UserAccount[];
+  signInUser: (account: UserAccount) => void;
+  switchUserByMobile: (mobile: string) => void;
+  signOutUser: () => void;
+  isSignInModalOpen: boolean;
+  setIsSignInModalOpen: (open: boolean) => void;
+  isLoggedIn: boolean;
+  setIsLoggedIn: (loggedIn: boolean) => void;
+
   // Data-Driven Content Repository
   contentRepo: IContentRepository;
   
@@ -105,23 +118,90 @@ interface AppContextType {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [activePlayerId, setActivePlayerIdState] = useState<string>(() => {
-    return PlayerProfileStorage.getActivePlayerId();
+  // 1. User Account State (Primary Key = parentMobile)
+  const [currentUser, setCurrentUser] = useState<UserAccount | null>(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const hasSession = window.localStorage.getItem('untangle_logged_in') === 'true';
+        if (hasSession) {
+          return UserAccountService.getActiveAccount();
+        }
+      }
+    } catch {
+      // ignore
+    }
+    return null;
   });
 
+  const [registeredAccounts, setRegisteredAccounts] = useState<UserAccount[]>(() => {
+    return UserAccountService.listAccounts();
+  });
+
+  const [isSignInModalOpen, setIsSignInModalOpen] = useState<boolean>(false);
+
+  // Persistent Login Session: Stays logged in across page reloads and hosting!
+  const [isLoggedIn, setIsLoggedInState] = useState<boolean>(() => {
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        const hasSession = window.localStorage.getItem('untangle_logged_in') === 'true';
+        const activeMobile = UserAccountService.getActiveMobile();
+        const account = activeMobile ? UserAccountService.getAccount(activeMobile) : null;
+        return Boolean(hasSession && account);
+      }
+    } catch {
+      // ignore
+    }
+    return false;
+  });
+
+  const setIsLoggedIn = (logged: boolean) => {
+    setIsLoggedInState(logged);
+    try {
+      if (typeof window !== 'undefined' && window.localStorage) {
+        if (logged) {
+          window.localStorage.setItem('untangle_logged_in', 'true');
+        } else {
+          window.localStorage.removeItem('untangle_logged_in');
+        }
+      }
+    } catch {
+      // ignore
+    }
+  };
+
+  // 2. Active Player Learning Profile (Isolated by parentMobile!)
   const [activePlayer, setActivePlayer] = useState<PlayerLearningProfile>(() => {
-    return PlayerProfileStorage.loadProfile(activePlayerId);
+    const activeMobile = currentUser?.parentMobile || UserAccountService.getActiveMobile() || '9876543210';
+    const profile = PlayerProfileStorage.loadProfile(activeMobile);
+    if (currentUser) {
+      return {
+        ...profile,
+        playerName: currentUser.childName,
+        avatar: currentUser.avatar,
+        language: currentUser.language,
+      };
+    }
+    return profile;
   });
 
   const [language, setLanguageState] = useState<AppLanguage>(() => {
-    return activePlayer.language || 'ta';
+    return currentUser?.language || activePlayer.language || 'ta';
   });
 
   const [appMode, setAppMode] = useState<'child' | 'parent'>('child');
   const [currentScreen, setCurrentScreen] = useState<ScreenId>('village');
   
+  // 3. Child Progress State (Isolated by parentMobile!)
   const [childProgress, setChildProgress] = useState<ChildProgressState>(() => {
-    return ProgressStorageService.load();
+    const activeMobile = currentUser?.parentMobile || UserAccountService.getActiveMobile() || '9876543210';
+    const progress = ProgressStorageService.load(activeMobile);
+    if (currentUser) {
+      return {
+        ...progress,
+        childName: currentUser.childName,
+      };
+    }
+    return progress;
   });
 
   const [currentLevelWords, setCurrentLevelWords] = useState<ContentItem[]>([]);
@@ -148,17 +228,79 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
 
   const setLanguage = (newLang: AppLanguage) => {
     setLanguageState(newLang);
+    if (currentUser) {
+      const updatedAccount = { ...currentUser, language: newLang };
+      UserAccountService.saveAccount(updatedAccount);
+      setCurrentUser(updatedAccount);
+    }
     setActivePlayer(prev => {
       const updated = { ...prev, language: newLang };
-      PlayerProfileStorage.saveProfile(updated);
+      PlayerProfileStorage.saveProfile(updated, currentUser?.parentMobile);
       return updated;
     });
   };
 
-  const switchPlayer = (newPlayerId: string) => {
-    PlayerProfileStorage.setActivePlayerId(newPlayerId);
-    setActivePlayerIdState(newPlayerId);
-    const profile = PlayerProfileStorage.loadProfile(newPlayerId);
+  // Sign in or register user with complete data isolation
+  const signInUser = (account: UserAccount) => {
+    UserAccountService.saveAccount(account);
+    UserAccountService.setActiveMobile(account.parentMobile);
+    setCurrentUser(account);
+    setRegisteredAccounts(UserAccountService.listAccounts());
+    setIsLoggedIn(true);
+
+    // Load isolated profile & progress for this mobile number
+    const profile = PlayerProfileStorage.loadProfile(account.parentMobile);
+    setActivePlayer({
+      ...profile,
+      playerName: account.childName,
+      avatar: account.avatar,
+      language: account.language,
+    });
+    setLanguageState(account.language);
+
+    const progress = ProgressStorageService.load(account.parentMobile);
+    setChildProgress({
+      ...progress,
+      childName: account.childName,
+    });
+  };
+
+  // Switch between registered accounts by mobile primary key
+  const switchUserByMobile = (mobile: string) => {
+    const account = UserAccountService.switchAccount(mobile);
+    if (account) {
+      setCurrentUser(account);
+      setRegisteredAccounts(UserAccountService.listAccounts());
+      setIsLoggedIn(true);
+
+      const profile = PlayerProfileStorage.loadProfile(account.parentMobile);
+      setActivePlayer(profile);
+      setLanguageState(account.language);
+
+      const progress = ProgressStorageService.load(account.parentMobile);
+      setChildProgress({
+        ...progress,
+        childName: account.childName,
+      });
+    }
+  };
+
+  const signOutUser = () => {
+    UserAccountService.signOut();
+    setCurrentUser(null);
+    setIsLoggedIn(false);
+    setIsSignInModalOpen(false);
+  };
+
+  const switchPlayer = (playerIdOrMobile: string) => {
+    const cleanMobile = UserAccountService.cleanMobile(playerIdOrMobile);
+    if (cleanMobile.length >= 10) {
+      switchUserByMobile(cleanMobile);
+      return;
+    }
+
+    PlayerProfileStorage.setActivePlayerId(playerIdOrMobile);
+    const profile = PlayerProfileStorage.loadProfile(playerIdOrMobile);
     setActivePlayer(profile);
     setLanguageState(profile.language);
   };
@@ -193,9 +335,13 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
     loadLevelContent(activePlayer, language);
   }, [activePlayer.playerId, activePlayer.currentLevel, language, loadLevelContent]);
 
+  // Persist childProgress isolated by mobile number
   useEffect(() => {
-    ProgressStorageService.save(childProgress);
-  }, [childProgress]);
+    const activeMobile = currentUser?.parentMobile || UserAccountService.getActiveMobile();
+    if (activeMobile) {
+      ProgressStorageService.save(childProgress, activeMobile);
+    }
+  }, [childProgress, currentUser]);
 
   useEffect(() => {
     try {
@@ -264,7 +410,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       lastUpdated: new Date().toISOString(),
     };
 
-    PlayerProfileStorage.saveProfile(updatedProfile);
+    PlayerProfileStorage.saveProfile(updatedProfile, currentUser?.parentMobile);
     setActivePlayer(updatedProfile);
 
     recordLearningEvent({
@@ -326,7 +472,7 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
       contentId: params.contentId,
       outcome: params.outcome,
       context: {
-        childName: activePlayer.playerName,
+        childName: currentUser?.childName || activePlayer.playerName,
         ...params.context,
       },
     });
@@ -341,7 +487,8 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
   };
 
   const resetProgress = () => {
-    ProgressStorageService.reset();
+    const activeMobile = currentUser?.parentMobile || UserAccountService.getActiveMobile();
+    ProgressStorageService.reset(activeMobile || undefined);
     setChildProgress(INITIAL_PROGRESS_STATE);
   };
 
@@ -360,6 +507,15 @@ export const AppProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         setAppMode,
         currentScreen,
         setCurrentScreen,
+        currentUser,
+        registeredAccounts,
+        signInUser,
+        switchUserByMobile,
+        signOutUser,
+        isSignInModalOpen,
+        setIsSignInModalOpen,
+        isLoggedIn,
+        setIsLoggedIn,
         contentRepo: contentRepository,
         activePlayer,
         availablePlayers: PRESET_PLAYERS,

@@ -1,5 +1,15 @@
-// Web Audio API Sound Effects Synthesizer + Web Speech API helper
-// Ensures 100% offline compatibility, zero external asset dependencies
+// Web Audio API Sound Effects Synthesizer + Emotional Speech Synthesis Engine
+// Ensures 100% offline compatibility with rich prosody, emotion modulation, and zero robotic monotone
+
+export type SpeechEmotion =
+  | 'excited'       // Celebrations, victories, high-energy ("Wow! You got it right! 🎉")
+  | 'happy'         // Friendly companion conversation, cheerful greetings
+  | 'storyteller'   // Warm, theatrical, expressive bedtime story narration with natural pauses
+  | 'warm_mother'   // Gentle maternal tone (Amma) - warm, loving, reassuring
+  | 'warm_father'   // Deep, comforting paternal tone (Appa) - calm, steady
+  | 'gentle_grandma'// Soft, melodic storytelling cadence (Paati)
+  | 'curious'       // Wonder, mystery, questions ("Hmm... I wonder what this means?")
+  | 'encouraging';  // Gentle coaching when struggling ("Let's try that together!")
 
 class SoundManager {
   private ctx: AudioContext | null = null;
@@ -7,7 +17,9 @@ class SoundManager {
 
   private initCtx() {
     if (!this.ctx && typeof window !== 'undefined') {
-      const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+      const AudioContextClass =
+        window.AudioContext ||
+        (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       if (AudioContextClass) {
         this.ctx = new AudioContextClass();
       }
@@ -35,10 +47,10 @@ class SoundManager {
     notes.forEach((freq, i) => {
       const osc = this.ctx!.createOscillator();
       const gain = this.ctx!.createGain();
-      
+
       osc.type = 'sine';
       osc.frequency.setValueAtTime(freq, this.ctx!.currentTime + i * 0.08);
-      
+
       gain.gain.setValueAtTime(0.001, this.ctx!.currentTime + i * 0.08);
       gain.gain.exponentialRampToValueAtTime(0.2, this.ctx!.currentTime + i * 0.08 + 0.02);
       gain.gain.exponentialRampToValueAtTime(0.0001, this.ctx!.currentTime + i * 0.08 + 0.35);
@@ -141,7 +153,6 @@ class SoundManager {
     this.initCtx();
     if (!this.ctx) return;
 
-    // Filtered noise swoosh
     const bufferSize = this.ctx.sampleRate * 0.6;
     const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
     const data = buffer.getChannelData(0);
@@ -182,7 +193,6 @@ class SoundManager {
     const now = this.ctx.currentTime;
 
     if (type === 'bass') {
-      // Deep resonant bass 'Tha'
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
@@ -199,7 +209,6 @@ class SoundManager {
       osc.start(now);
       osc.stop(now + 0.38);
     } else if (type === 'slap') {
-      // High pitch resonant tone 'Dhin'
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
@@ -216,7 +225,6 @@ class SoundManager {
       osc.start(now);
       osc.stop(now + 0.24);
     } else {
-      // Crisp wooden rim hit 'Thom'
       const osc = this.ctx.createOscillator();
       const gain = this.ctx.createGain();
 
@@ -270,8 +278,22 @@ class SoundManager {
     }
   }
 
-  // Text-To-Speech using Web Speech API
-  public speak(text: string, lang: 'en' | 'ta' = 'en') {
+  /**
+   * High-Emotion Speech Synthesizer:
+   * Dynamically applies prosodic emotion curves, pitch inflection, storytelling breath pauses,
+   * and acoustic warmths so children NEVER experience robotic monotone speech.
+   */
+  public speak(
+    text: string,
+    lang: 'en' | 'ta' = 'en',
+    options?: {
+      pitch?: number;
+      rate?: number;
+      volume?: number;
+      voiceGender?: 'female' | 'male';
+      emotion?: SpeechEmotion;
+    }
+  ) {
     if (this.isQuietMode) return;
     if (typeof window === 'undefined' || !('speechSynthesis' in window)) {
       this.playMindyChirp();
@@ -280,24 +302,189 @@ class SoundManager {
 
     try {
       window.speechSynthesis.cancel();
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = lang === 'ta' ? 'ta-IN' : 'en-US';
-      utterance.rate = 0.9; // Friendly, clear pacing for children
-      utterance.pitch = 1.25; // Cheerful companion voice pitch
 
-      // Try to find native voice
+      // Clean plain words: remove emoji icons or special brackets so TTS does not read them literally
+      const cleanText = text
+        .replace(/[\u{1F300}-\u{1FAFF}]/gu, '')
+        .replace(/[(){}[\]]/g, '')
+        .trim();
+
+      if (!cleanText) return;
+
+      const emotion = options?.emotion || 'happy';
+
+      // 1. Emotion Profiles with Dynamic Pitch, Rate, and Expressive Inflection
+      let baseRate = options?.rate ?? 0.9;
+      let basePitch = options?.pitch ?? 1.2;
+
+      switch (emotion) {
+        case 'excited':
+          // High-energy celebration! Lively, bouncy tempo with soaring pitch contour
+          baseRate = 1.02;
+          basePitch = 1.38;
+          break;
+
+        case 'storyteller':
+          // Theatrical bedtime storytelling! Unhurried, melodic, rich prosody with dramatic pauses
+          baseRate = 0.84;
+          basePitch = 1.18;
+          break;
+
+        case 'warm_mother':
+          // Amma's warm, comforting, gentle maternal embrace
+          baseRate = 0.88;
+          basePitch = 1.25;
+          break;
+
+        case 'warm_father':
+          // Appa's deep, steady, protective baritone warmth
+          baseRate = 0.85;
+          basePitch = 0.74;
+          break;
+
+        case 'gentle_grandma':
+          // Paati's calm, melodic, bedtime folktale cadence
+          baseRate = 0.78;
+          basePitch = 1.08;
+          break;
+
+        case 'curious':
+          // Playful mystery and wondering tone, higher questioning inflection
+          baseRate = 0.92;
+          basePitch = 1.32;
+          break;
+
+        case 'encouraging':
+          // Reassuring, patient, affectionate coaching
+          baseRate = 0.88;
+          basePitch = 1.15;
+          break;
+
+        case 'happy':
+        default:
+          baseRate = 0.92;
+          basePitch = 1.22;
+          break;
+      }
+
+      // 2. Play acoustic emotional earcon to set the affective mood in the child's auditory cortex
+      if (emotion === 'excited') {
+        this.playCelebration();
+      } else if (emotion === 'curious' || emotion === 'happy') {
+        this.playMindyChirp();
+      } else if (emotion === 'encouraging') {
+        this.playTap();
+      }
+
+      // 3. Construct SpeechSynthesisUtterance with emotional prosody
+      const utterance = new SpeechSynthesisUtterance(cleanText);
+      utterance.lang = lang === 'ta' ? 'ta-IN' : 'en-US';
+      utterance.rate = baseRate;
+      utterance.pitch = basePitch;
+      utterance.volume = options?.volume ?? 1.0;
+
+      // 4. Voice Selection prioritizing expressive, natural human voice models
       const voices = window.speechSynthesis.getVoices();
       if (voices.length > 0) {
         const targetPrefix = lang === 'ta' ? 'ta' : 'en';
-        const match = voices.find(v => v.lang.toLowerCase().startsWith(targetPrefix));
-        if (match) {
-          utterance.voice = match;
+        const langVoices = voices.filter((v) => v.lang.toLowerCase().startsWith(targetPrefix));
+
+        // Prioritize premium/natural/neural voices over default robotic synthesizers
+        const naturalVoices = langVoices.filter(
+          (v) =>
+            v.name.includes('Natural') ||
+            v.name.includes('Neural') ||
+            v.name.includes('Google') ||
+            v.name.includes('Samantha') ||
+            v.name.includes('Siri') ||
+            v.name.includes('Karen') ||
+            v.name.includes('Daniel')
+        );
+
+        const activePool = naturalVoices.length > 0 ? naturalVoices : langVoices;
+
+        if (options?.voiceGender === 'male' || emotion === 'warm_father') {
+          const maleVoice = activePool.find(
+            (v) =>
+              v.name.toLowerCase().includes('male') ||
+              v.name.toLowerCase().includes('david') ||
+              v.name.toLowerCase().includes('george') ||
+              v.name.toLowerCase().includes('daniel') ||
+              v.name.toLowerCase().includes('alex') ||
+              v.name.toLowerCase().includes('rishi')
+          );
+          if (maleVoice) utterance.voice = maleVoice;
+          else if (activePool[0]) utterance.voice = activePool[0];
+        } else if (emotion === 'gentle_grandma') {
+          // Paati voice selection: seeks mature, gentle storytelling timbre
+          const grandmaVoice = activePool.find(
+            (v) =>
+              v.name.toLowerCase().includes('grandma') ||
+              v.name.toLowerCase().includes('victoria') ||
+              v.name.toLowerCase().includes('fiona') ||
+              v.name.toLowerCase().includes('moira') ||
+              v.name.toLowerCase().includes('karen') ||
+              v.name.toLowerCase().includes('zira')
+          );
+          if (grandmaVoice) utterance.voice = grandmaVoice;
+          else if (activePool[0]) utterance.voice = activePool[0];
+        } else {
+          // Amma voice selection: seeks melodic, warm maternal timbre
+          const femaleVoice = activePool.find(
+            (v) =>
+              v.name.toLowerCase().includes('samantha') ||
+              v.name.toLowerCase().includes('siri') ||
+              v.name.toLowerCase().includes('leena') ||
+              v.name.toLowerCase().includes('veena') ||
+              v.name.toLowerCase().includes('female')
+          );
+          if (femaleVoice) utterance.voice = femaleVoice;
+          else if (activePool[0]) utterance.voice = activePool[0];
         }
       }
 
       window.speechSynthesis.speak(utterance);
     } catch {
       this.playMindyChirp();
+    }
+  }
+
+  /**
+   * Dedicated Family Speaker Voice Profiler:
+   * Gives Amma, Appa, and Paati completely distinct acoustic textures,
+   * pitch fundamentals, rates, and timbres so no two voices sound the same!
+   */
+  public speakFamilyVoice(
+    speaker: 'amma' | 'appa' | 'paati',
+    text: string,
+    lang: 'en' | 'ta' = 'en'
+  ) {
+    if (this.isQuietMode) return;
+
+    if (speaker === 'appa') {
+      // APPA: Deep, resonant, grounded baritone
+      this.speak(text, lang, {
+        emotion: 'warm_father',
+        pitch: 0.62,
+        rate: 0.82,
+        voiceGender: 'male',
+      });
+    } else if (speaker === 'paati') {
+      // PAATI: Gentle, unhurried, folktale grandmotherly cadence
+      this.speak(text, lang, {
+        emotion: 'gentle_grandma',
+        pitch: 0.94,
+        rate: 0.70,
+        voiceGender: 'female',
+      });
+    } else {
+      // AMMA: Warm, melodic, comforting maternal embrace
+      this.speak(text, lang, {
+        emotion: 'warm_mother',
+        pitch: 1.36,
+        rate: 0.90,
+        voiceGender: 'female',
+      });
     }
   }
 }

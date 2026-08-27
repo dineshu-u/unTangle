@@ -1,0 +1,28 @@
+[
+  {
+    "id": "en_story_ant",
+    "language": "en",
+    "title": "The Little Ant's Sweet Adventure",
+    "illustration": "🐜🍃",
+    "difficulty": 1,
+    "sentences": [
+      "In the sunny village garden, a tiny little Ant found a sparkling white sugar cube.",
+      "The cube was much bigger than the ant, but the ant was strong, cheerful, and patient.",
+      "With steady steps across the green leaf, the ant carried the sugar to the banyan tree.",
+      "Mindy the bird chirped happily: Little friends can do mighty wonders!"
+    ]
+  },
+  {
+    "id": "en_story_kite",
+    "language": "en",
+    "title": "The Sky Dancer Kite",
+    "illustration": "🪁✨",
+    "difficulty": 1,
+    "sentences": [
+      "Aarav held the cotton string tight as the fresh breeze touched his smiling face.",
+      "The diamond kite smiled, waving its colorful tail of red, yellow, and blue ribbons.",
+      "Higher and higher it soared, dancing above the village tiled roofs and green trees.",
+      "When we build real words with care, our thoughts fly high like the friendly kite!"
+    ]
+  }
+]

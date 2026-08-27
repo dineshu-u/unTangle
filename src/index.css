@@ -14,9 +14,39 @@
   font-style: normal;
 }
 
+/* Tamil Dyslexia Font (UntangleTamil loaded from assets folder) */
+@font-face {
+  font-family: 'UntangleTamil';
+  src: url('/assets/UntangleTamil-v5-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UntangleTamil';
+  src: url('/assets/UntangleTamil-v5-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UntangleTamil-v5-Regular';
+  src: url('/assets/UntangleTamil-v5-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'UntangleTamil-v5-Bold';
+  src: url('/assets/UntangleTamil-v5-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
 :root {
   --font-dyslexic: 'OpenDyslexic', 'Lexend', 'Comic Neue', sans-serif;
-  --font-tamil: 'Noto Sans Tamil', sans-serif;
+  --font-tamil-dyslexic: 'UntangleTamil', 'UntangleTamil-v5-Regular', sans-serif;
+  --font-tamil-standard: 'Noto Sans Tamil', sans-serif;
   --font-child: 'Fredoka', 'Quicksand', system-ui, sans-serif;
 }
 
@@ -49,14 +79,65 @@ html, body {
   word-spacing: 0.1em;
 }
 
-.font-tamil {
-  font-family: var(--font-tamil);
+/* Tamil Dyslexia Font: UntangleTamil ONLY (Default) */
+.font-tamil-dyslexic,
+.font-tamil-dyslexic * {
+  font-family: 'UntangleTamil', 'UntangleTamil-v5-Regular', sans-serif !important;
+  letter-spacing: 0.03em;
+  word-spacing: 0.08em;
+}
+
+/* Standard Tamil Font: Only used when explicitly turned off by parents in settings */
+.font-tamil-standard,
+.font-tamil-standard * {
+  font-family: 'Noto Sans Tamil', sans-serif !important;
+  letter-spacing: 0.01em;
+}
+
+.font-tamil,
+.font-tamil * {
+  font-family: 'UntangleTamil', 'UntangleTamil-v5-Regular', sans-serif !important;
   letter-spacing: 0.02em;
 }
 
 .font-child {
   font-family: var(--font-child);
 }
+
+/* ==========================================================================
+   Login screen styles
+   ========================================================================== */
+
+.login-kite {
+  animation: login-kite-sway 4.5s ease-in-out infinite;
+  transform-origin: 50% 0%;
+}
+
+@keyframes login-kite-sway {
+  0%, 100% { transform: rotate(-6deg) translateY(0); }
+  50%       { transform: rotate(6deg) translateY(-6px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-kite { animation: none; }
+}
+
+.login-input {
+  outline: none;
+}
+.login-input:focus {
+  outline: 3px solid #F2789F;
+  outline-offset: 1px;
+}
+
+.login-btn:focus-visible {
+  outline: 3px solid #F2789F;
+  outline-offset: 3px;
+}
+
+/* ==========================================================================
+   Utility
+   ========================================================================== */
 
 /* Hide scrollbar for clean horizontal tab bars */
 .no-scrollbar::-webkit-scrollbar {

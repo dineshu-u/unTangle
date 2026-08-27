@@ -7,11 +7,13 @@ import { Compass, LayoutGrid, MessageCircle } from 'lucide-react';
 import { TalkingMindyCompanion } from '../../components/TalkingMindyCompanion';
 
 export const VillageHomeView: React.FC = () => {
-  const { language, t, setCurrentScreen, childProgress, claimDailyQuestReward, adaptiveRecommendation } = useApp();
+  const { language, t, setCurrentScreen, childProgress, claimDailyQuestReward, adaptiveRecommendation, currentUser } = useApp();
   const [viewMode, setViewMode] = useState<'map' | 'hub'>('map');
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [claimedReward, setClaimedReward] = useState(false);
   const [showTalkingMindy, setShowTalkingMindy] = useState(false);
+
+  const activeChildName = currentUser?.childName || 'Aarav';
 
   const locations: {
     id: ScreenId;
@@ -135,16 +137,21 @@ export const VillageHomeView: React.FC = () => {
 
   return (
     <div className="w-full flex-1 flex flex-col relative overflow-y-auto overflow-x-hidden">
-      {/* Village View Switcher Header */}
-      <div className="bg-amber-100/90 border-b border-amber-200 px-3 py-2 flex items-center justify-between z-20 shadow-2xs">
+      {/* Village Header: {Username}'s Village with elegant unTangle branding badge */}
+      <div className="bg-amber-100/95 border-b border-amber-200 px-3 py-2 flex items-center justify-between z-20 shadow-2xs shrink-0">
         <div className="flex items-center gap-2">
           <span className="text-xl">🌳</span>
           <div>
-            <h2 className="text-xs sm:text-sm font-black text-amber-950 leading-tight">
-              {t.villageTitle}
-            </h2>
+            <div className="flex items-center gap-1.5">
+              <span className="text-[9px] font-black uppercase tracking-wider bg-amber-200/90 text-amber-950 px-1.5 py-0.2 rounded-md border border-amber-300 shadow-2xs">
+                unTangle
+              </span>
+              <h2 className="text-xs sm:text-sm font-black text-amber-950 leading-tight">
+                {language === 'ta' ? `${activeChildName} கிராமம்` : `${activeChildName}'s Village`}
+              </h2>
+            </div>
             <p className="text-[10px] text-amber-800 font-medium">
-              {t.villageSubtitle}
+              {language === 'ta' ? 'சாகசங்கள் நிறைந்த உயிரோட்டமான வரைபடம்' : 'Explore friendly adventures & stories'}
             </p>
           </div>
         </div>
@@ -195,15 +202,15 @@ export const VillageHomeView: React.FC = () => {
             <div className="absolute inset-0 bg-radial from-amber-200/20 via-transparent to-black/15 pointer-events-none" />
           </div>
 
-          {/* Drifting Clouds & Kite animations over the village */}
-          <div className="absolute top-4 left-6 animate-pulse opacity-85 pointer-events-none">
-            <span className="text-3xl drop-shadow-md">☁️</span>
+          {/* Gentle ambient storybook clouds */}
+          <div className="absolute top-4 left-8 opacity-75 pointer-events-none">
+            <span className="text-3xl drop-shadow-sm">☁️</span>
           </div>
-          <div className="absolute top-12 right-12 animate-bounce opacity-85 pointer-events-none" style={{ animationDuration: '4s' }}>
-            <span className="text-2xl drop-shadow-md">🪁</span>
+          <div className="absolute top-14 right-20 opacity-75 pointer-events-none">
+            <span className="text-2xl drop-shadow-sm">☁️</span>
           </div>
 
-          {/* Interactive Floating Hotspot Pins over Village Locations */}
+          {/* Clean Storybook Landmark Pins (Non-animated, crisp & kid-friendly) */}
           {locations.map((loc) => {
             const isHovered = hoveredLocation === loc.id;
             const title = language === 'ta' ? loc.titleTa : loc.titleEn;
@@ -218,27 +225,28 @@ export const VillageHomeView: React.FC = () => {
                 onMouseEnter={() => setHoveredLocation(loc.id)}
                 onMouseLeave={() => setHoveredLocation(null)}
               >
-                {/* Pulsating Map Pin Button */}
+                {/* Clean Storybook Pin Button */}
                 <button
                   onClick={() => handleNavigate(loc.id)}
-                  className="relative flex flex-col items-center justify-center transition-transform transform group-hover:scale-115 active:scale-95 cursor-pointer focus:outline-none"
+                  className="relative flex flex-col items-center justify-center cursor-pointer focus:outline-none group active:scale-95"
                   title={title}
                 >
-                  <span className="absolute -inset-2 rounded-full bg-white/60 animate-ping opacity-60 pointer-events-none" />
-
+                  {/* 3D Storybook Landmark Badge */}
                   <div
-                    className={`w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-gradient-to-tr ${loc.bgColor} text-white shadow-xl border-2 border-white flex items-center justify-center text-xl sm:text-2xl transform transition-transform group-hover:rotate-6`}
+                    className={`w-11 h-11 sm:w-13 sm:h-13 rounded-full bg-gradient-to-tr ${loc.bgColor} text-white shadow-lg shadow-stone-900/30 border-2 border-white flex items-center justify-center text-xl sm:text-2xl`}
                   >
                     <span>{loc.emoji.slice(0, 2)}</span>
                   </div>
 
+                  {/* Static Milestone Badge (e.g. 4/30 or Teach!) */}
                   {badge && (
-                    <span className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 text-[9px] font-black px-1.5 py-0.5 rounded-full border border-white shadow-xs animate-bounce">
+                    <span className="absolute -top-1 -right-1 bg-amber-400 text-amber-950 text-[9px] font-black px-1.5 py-0.2 rounded-full border border-white shadow-xs">
                       {badge}
                     </span>
                   )}
 
-                  <div className="mt-1 bg-white/95 backdrop-blur-xs border border-amber-300 rounded-full px-2 py-0.5 shadow-md flex items-center gap-1 transition-all group-hover:bg-amber-50 group-hover:scale-105">
+                  {/* Parchment Title Tag */}
+                  <div className="mt-1 bg-white/95 backdrop-blur-xs border border-amber-300/80 rounded-full px-2 py-0.5 shadow-xs flex items-center gap-1">
                     <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 whitespace-nowrap">
                       {title}
                     </span>
