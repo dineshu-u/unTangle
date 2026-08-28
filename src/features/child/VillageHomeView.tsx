@@ -7,13 +7,13 @@ import { Compass, LayoutGrid, MessageCircle } from 'lucide-react';
 import { TalkingMindyCompanion } from '../../components/TalkingMindyCompanion';
 
 export const VillageHomeView: React.FC = () => {
-  const { language, t, setCurrentScreen, childProgress, claimDailyQuestReward, adaptiveRecommendation, currentUser } = useApp();
+  const { language, t, setCurrentScreen, childProgress, claimDailyQuestReward, adaptiveRecommendation, currentUser, activePlayer } = useApp();
   const [viewMode, setViewMode] = useState<'map' | 'hub'>('map');
   const [hoveredLocation, setHoveredLocation] = useState<string | null>(null);
   const [claimedReward, setClaimedReward] = useState(false);
   const [showTalkingMindy, setShowTalkingMindy] = useState(false);
 
-  const activeChildName = currentUser?.childName || 'Aarav';
+  const activeChildName = currentUser?.childName || activePlayer.playerName || (language === 'ta' ? 'கற்பவர்' : 'Learner');
 
   const locations: {
     id: ScreenId;
@@ -34,7 +34,7 @@ export const VillageHomeView: React.FC = () => {
       descEn: 'Chat & Teach Mindy new words!',
       descTa: 'மிண்டியுடன் பேசி புதிய சொற்கள் கற்பிக்கலாம்!',
       emoji: '🐦🏡',
-      pos: { top: '38%', left: '16%' },
+      pos: { top: '36%', left: '18%' },
       bgColor: 'from-amber-400 to-orange-500',
       badgeEn: 'Teach!',
       badgeTa: 'கற்பி!',
@@ -46,10 +46,42 @@ export const VillageHomeView: React.FC = () => {
       descEn: 'Meet animal creatures & letters',
       descTa: 'விலங்குகள், பறவைகள் மற்றும் எழுத்துக்கள்',
       emoji: '🌺🦋',
-      pos: { top: '22%', left: '42%' },
+      pos: { top: '20%', left: '44%' },
       bgColor: 'from-emerald-400 to-green-600',
       badgeEn: '4/30',
       badgeTa: '4/30',
+    },
+    {
+      id: 'village_mela',
+      titleEn: 'Village Mela Festival',
+      titleTa: 'கிராமத்து மேளா',
+      descEn: 'Lanterns, kolam & grand celebrations!',
+      descTa: 'வண்ண விளக்குகள் மற்றும் திருவிழா விளையாட்டுகள்!',
+      emoji: '🎪🏮',
+      pos: { top: '24%', left: '74%' },
+      bgColor: 'from-amber-500 to-red-500',
+      badgeEn: 'Mela!',
+      badgeTa: 'மேளா!',
+    },
+    {
+      id: 'learning_garden',
+      titleEn: 'My Learning Garden',
+      titleTa: 'என் தோட்டம்',
+      descEn: 'Harvest word fruits & sound flowers',
+      descTa: 'சொல் பழங்கள் மற்றும் பூக்கள் அறுவடை',
+      emoji: '🌱🍎',
+      pos: { top: '44%', left: '72%' },
+      bgColor: 'from-lime-500 to-emerald-600',
+    },
+    {
+      id: 'family_voice',
+      titleEn: 'Family Voice Cottage',
+      titleTa: 'குடும்ப குரல் குடில்',
+      descEn: 'Hear loving cheers from Amma & Appa',
+      descTa: 'அம்மா, அப்பாவின் அன்பான குரல் ஆசி',
+      emoji: '🎙️❤️',
+      pos: { top: '58%', left: '18%' },
+      bgColor: 'from-teal-400 to-cyan-600',
     },
     {
       id: 'word_kite',
@@ -58,7 +90,7 @@ export const VillageHomeView: React.FC = () => {
       descEn: 'Build words & let your kite soar!',
       descTa: 'சொற்கள் அமைத்து பட்டம் பறக்க விடுங்கள்!',
       emoji: '🪁✨',
-      pos: { top: '56%', left: '76%' },
+      pos: { top: '62%', left: '68%' },
       bgColor: 'from-sky-400 to-blue-600',
       badgeEn: 'Fly!',
       badgeTa: 'பறக்க!',
@@ -70,7 +102,7 @@ export const VillageHomeView: React.FC = () => {
       descEn: 'Tap village stone drums with rhythm!',
       descTa: 'கிராமத்து மத்தளத்தை தாளத்தோடு தட்டுங்கள்!',
       emoji: '🥁🪘',
-      pos: { top: '78%', left: '26%' },
+      pos: { top: '78%', left: '30%' },
       bgColor: 'from-purple-500 to-indigo-600',
     },
     {
@@ -80,40 +112,8 @@ export const VillageHomeView: React.FC = () => {
       descEn: 'Reading Lens & calm story cards',
       descTa: 'வாசிப்பு லென்ஸ் மற்றும் வண்ண கதைகள்',
       emoji: '📖🔍',
-      pos: { top: '74%', left: '80%' },
+      pos: { top: '80%', left: '74%' },
       bgColor: 'from-rose-400 to-pink-600',
-    },
-    {
-      id: 'learning_garden',
-      titleEn: 'My Learning Garden',
-      titleTa: 'என் தோட்டம்',
-      descEn: 'Harvest word fruits & sound flowers',
-      descTa: 'சொல் பழங்கள் மற்றும் பூக்கள் அறுவடை',
-      emoji: '🌱🍎',
-      pos: { top: '44%', left: '88%' },
-      bgColor: 'from-lime-500 to-emerald-600',
-    },
-    {
-      id: 'village_mela',
-      titleEn: 'Village Mela Festival',
-      titleTa: 'கிராமத்து மேளா',
-      descEn: 'Lanterns, kolam & grand celebrations!',
-      descTa: 'வண்ண விளக்குகள் மற்றும் திருவிழா விளையாட்டுகள்!',
-      emoji: '🎪🏮',
-      pos: { top: '30%', left: '86%' },
-      bgColor: 'from-amber-500 to-red-500',
-      badgeEn: 'Mela!',
-      badgeTa: 'மேளா!',
-    },
-    {
-      id: 'family_voice',
-      titleEn: 'Family Voice Cottage',
-      titleTa: 'குடும்ப குரல் குடில்',
-      descEn: 'Hear loving cheers from Amma & Appa',
-      descTa: 'அம்மா, அப்பாவின் அன்பான குரல் ஆசி',
-      emoji: '🎙️❤️',
-      pos: { top: '56%', left: '12%' },
-      bgColor: 'from-teal-400 to-cyan-600',
     },
   ];
 
@@ -245,16 +245,22 @@ export const VillageHomeView: React.FC = () => {
                     </span>
                   )}
 
-                  {/* Parchment Title Tag */}
-                  <div className="mt-1 bg-white/95 backdrop-blur-xs border border-amber-300/80 rounded-full px-2 py-0.5 shadow-xs flex items-center gap-1">
-                    <span className="text-[10px] sm:text-[11px] font-bold text-slate-800 whitespace-nowrap">
+                  {/* Parchment Title Tag (No Ellipsis / No Truncate) */}
+                  <div className="mt-1 bg-white/95 backdrop-blur-xs border border-amber-300/80 rounded-xl px-2 py-0.5 shadow-xs flex items-center justify-center text-center max-w-[125px]">
+                    <span className="text-[9.5px] sm:text-[11px] font-bold text-slate-800 leading-tight block">
                       {title}
                     </span>
                   </div>
                 </button>
 
                 {isHovered && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-44 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border-2 border-amber-300 z-30 pointer-events-none animate-in fade-in zoom-in-90 duration-150 text-center">
+                  <div className={`absolute bottom-full mb-2 w-44 bg-white/95 backdrop-blur-md rounded-2xl p-2.5 shadow-2xl border-2 border-amber-300 z-30 pointer-events-none animate-in fade-in zoom-in-90 duration-150 text-center ${
+                    parseInt(loc.pos.left) > 65
+                      ? 'right-0 translate-x-0'
+                      : parseInt(loc.pos.left) < 25
+                      ? 'left-0 translate-x-0'
+                      : 'left-1/2 -translate-x-1/2'
+                  }`}>
                     <p className="text-xs font-bold text-slate-900 leading-snug">
                       {title}
                     </p>
@@ -374,28 +380,28 @@ export const VillageHomeView: React.FC = () => {
             </button>
           </div>
 
-          {/* Secondary Features Grid */}
+          {/* Secondary Features Grid (Clean text, no premature ellipsis!) */}
           <div className="grid grid-cols-3 gap-2">
             <button
               onClick={() => handleNavigate('pulse_path')}
               className="bg-indigo-50 border border-indigo-200 rounded-2xl p-2 text-center shadow-2xs hover:bg-indigo-100 transition-colors"
             >
               <span className="text-xl block mb-0.5">🥁</span>
-              <span className="text-[10px] font-bold text-indigo-900 block truncate">{t.pulsePathBtn}</span>
+              <span className="text-[10px] font-bold text-indigo-900 block leading-tight">{t.pulsePathBtn}</span>
             </button>
             <button
               onClick={() => handleNavigate('village_mela')}
               className="bg-amber-50 border border-amber-200 rounded-2xl p-2 text-center shadow-2xs hover:bg-amber-100 transition-colors"
             >
               <span className="text-xl block mb-0.5">🎪</span>
-              <span className="text-[10px] font-bold text-amber-900 block truncate">{t.villageMelaBtn}</span>
+              <span className="text-[10px] font-bold text-amber-900 block leading-tight">{t.villageMelaBtn}</span>
             </button>
             <button
               onClick={() => handleNavigate('reading_lens')}
               className="bg-rose-50 border border-rose-200 rounded-2xl p-2 text-center shadow-2xs hover:bg-rose-100 transition-colors"
             >
               <span className="text-xl block mb-0.5">📖</span>
-              <span className="text-[10px] font-bold text-rose-900 block truncate">{t.bookCornerBtn}</span>
+              <span className="text-[10px] font-bold text-rose-900 block leading-tight">{t.bookCornerBtn}</span>
             </button>
           </div>
 

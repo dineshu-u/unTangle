@@ -432,12 +432,12 @@ export const MindyHouseView: React.FC = () => {
               {childProgress.lessonCards.slice(0, 6).map((card) => (
                 <div
                   key={card.id}
-                  className="shrink-0 bg-white border border-amber-300 rounded-xl p-2 shadow-2xs text-center w-26"
+                  className="shrink-0 bg-white border border-amber-300 rounded-xl p-2 shadow-2xs text-center min-w-[100px] w-auto max-w-[130px]"
                 >
-                  <span className="text-xs font-black text-amber-950 block truncate">
+                  <span className="text-xs font-black text-amber-950 block leading-tight break-words">
                     {card.word}
                   </span>
-                  <span className="text-[9px] text-slate-500 block truncate mt-0.5">
+                  <span className="text-[9px] text-slate-500 block leading-tight mt-0.5 break-words">
                     {card.meaning}
                   </span>
                 </div>

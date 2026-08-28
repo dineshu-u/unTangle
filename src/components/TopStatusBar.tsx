@@ -8,7 +8,7 @@ interface TopStatusBarProps {
   onOpenParentGate: () => void;
 }
 
-export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onOpenParentGate }) => {
+export const TopStatusBar: React.FC<TopStatusBarProps> = () => {
   const {
     language,
     setLanguage,
@@ -45,42 +45,39 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onOpenParentGate }) 
   return (
     <>
       <header className="shrink-0 w-full bg-white/95 backdrop-blur-md border-b border-amber-200/80 px-2 sm:px-3 py-1.5 sm:py-2 select-none z-30 shadow-xs">
-        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full">
-          {/* Left: Active Learner Profile & Age Group (Child-friendly display pill, no switch/sign-out) */}
+        <div className="flex items-center justify-between gap-1 sm:gap-2 w-full min-w-0">
+          {/* Left: Active Learner Profile & Age Group (Child-friendly display pill, no ellipsis) */}
           <div
-            className="flex items-center bg-amber-50 border border-amber-200 rounded-full px-2 sm:px-2.5 py-1 shadow-2xs shrink-0 max-w-[155px] sm:max-w-[210px] select-none"
+            className="flex items-center bg-amber-50 border border-amber-200 rounded-full px-2 py-1 shadow-2xs shrink min-w-0 select-none"
           >
-            <span className="text-sm sm:text-base mr-1">{activeAvatar}</span>
-            <div className="flex flex-col text-left truncate">
-              <div className="flex items-center gap-1">
-                <span className="text-[10px] font-black text-amber-950 leading-none truncate">
+            <span className="text-sm sm:text-base mr-1 shrink-0">{activeAvatar}</span>
+            <div className="flex flex-col text-left min-w-0">
+              <div className="flex items-center gap-1 min-w-0">
+                <span className="text-[10.5px] font-black text-amber-950 leading-none whitespace-nowrap">
                   {activeName}
                 </span>
                 {activeAge && (
-                  <span className="text-[8px] font-bold text-amber-900 bg-amber-200/70 px-1 py-0.2 rounded-full shrink-0">
-                    {activeAge} • Lvl {currentLevelNumber}
+                  <span className="text-[8px] font-bold text-amber-900 bg-amber-200/70 px-1 py-0.2 rounded-full shrink-0 hidden xs:inline-block">
+                    {activeAge} • L{currentLevelNumber}
                   </span>
                 )}
               </div>
-              <span className="text-[9px] font-bold text-amber-800 leading-tight hidden sm:block truncate">
-                {language === 'ta' ? childProgress.levelTitleTa : childProgress.levelTitleEn}
-              </span>
             </div>
           </div>
 
-          {/* Center: Sound Storm Weather Pill */}
-          <div className="flex items-center bg-sky-50 border border-sky-200 rounded-full px-2 py-1 shadow-2xs shrink-0">
+          {/* Center: Sound Storm Weather Pill (Compact on mobile) */}
+          <div className="hidden xs:flex items-center bg-sky-50 border border-sky-200 rounded-full px-2 py-1 shadow-2xs shrink-0">
             <span className="text-xs sm:text-sm mr-1">
               {childProgress.stormProgress < 40 ? '⛈️' : childProgress.stormProgress < 80 ? '🌤️' : '☀️'}
             </span>
-            <div className="flex items-center gap-1 text-[9px] sm:text-[10px] font-black text-sky-900 leading-none">
+            <div className="flex items-center gap-0.5 text-[9.5px] sm:text-[10px] font-black text-sky-900 leading-none">
               <span className="hidden sm:inline">{t.soundStorm}</span>
               <span>{childProgress.stormProgress}%</span>
             </div>
           </div>
 
-          {/* Right: Controls + PROMINENT PARENT BUTTON (Always visible on mobile!) */}
-          <div className="flex items-center gap-1 shrink-0">
+          {/* Right: Controls + PROMINENT PARENT BUTTON (Always 100% visible on mobile!) */}
+          <div className="flex items-center gap-1 shrink-0 ml-auto">
             {/* Language Switcher */}
             <button
               onClick={toggleLanguage}
@@ -116,11 +113,14 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onOpenParentGate }) 
               {isQuietMode ? <VolumeX className="w-3 h-3" /> : <Volume2 className="w-3 h-3" />}
             </button>
 
-            {/* PROMINENT PARENT BUTTON: Opens Parent Verification Gate (Parent Mode has account controls) */}
+            {/* PROMINENT PARENT BUTTON: Directly opens Parent Dashboard with 1-Tap! */}
             {appMode === 'child' ? (
               <button
-                onClick={onOpenParentGate}
-                className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-2 sm:px-2.5 py-1 text-[11px] font-black shadow-xs transition-transform active:scale-95 shrink-0 ring-2 ring-emerald-300 cursor-pointer"
+                onClick={() => {
+                  sounds.playTap();
+                  setAppMode('parent');
+                }}
+                className="flex items-center gap-1 bg-emerald-600 hover:bg-emerald-700 text-white rounded-full px-2.5 py-1 text-[11px] font-black shadow-xs transition-transform active:scale-95 shrink-0 ring-2 ring-emerald-300 cursor-pointer z-20"
                 title={t.parentMode}
               >
                 <Shield className="w-3.5 h-3.5 shrink-0" />
@@ -132,7 +132,7 @@ export const TopStatusBar: React.FC<TopStatusBarProps> = ({ onOpenParentGate }) 
                   setAppMode('child');
                   sounds.playTap();
                 }}
-                className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white rounded-full px-2 sm:px-2.5 py-1 text-[11px] font-black shadow-xs transition-transform active:scale-95 shrink-0 cursor-pointer"
+                className="flex items-center gap-1 bg-amber-500 hover:bg-amber-600 text-white rounded-full px-2.5 py-1 text-[11px] font-black shadow-xs transition-transform active:scale-95 shrink-0 cursor-pointer z-20"
                 title={t.childMode}
               >
                 <span>🏡</span>

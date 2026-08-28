@@ -29,6 +29,8 @@ export const WordKiteView: React.FC = () => {
     completeLevelAndGenerateNext,
     recordWordKiteAttempt,
     requestMindySpeech,
+    currentUser,
+    activePlayer,
   } = useApp();
 
   const wordsInLevel = currentLevelWords.length > 0
@@ -304,10 +306,12 @@ export const WordKiteView: React.FC = () => {
             </div>
           </div>
 
-          {/* Smiling Boy Holding String */}
+          {/* Smiling Child Holding String (Dynamically reflects active child's avatar and name) */}
           <div className="absolute bottom-1 right-2 flex flex-col items-center">
-            <span className="text-3xl drop-shadow-md">👦🏽</span>
-            <span className="text-[9px] font-bold text-sky-950 bg-white/85 px-1.5 rounded-full">Aarav</span>
+            <span className="text-3xl drop-shadow-md">{currentUser?.avatar || activePlayer.avatar || '👦🏽'}</span>
+            <span className="text-[9px] font-bold text-sky-950 bg-white/85 px-1.5 rounded-full">
+              {currentUser?.childName || activePlayer.playerName || (language === 'ta' ? 'கற்பவர்' : 'Learner')}
+            </span>
           </div>
 
           <svg className="absolute inset-0 w-full h-full pointer-events-none">

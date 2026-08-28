@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { UserAccountService, PRESET_ACCOUNTS } from '../../services/persistence/userAccountService';
+import { UserAccountService } from '../../services/persistence/userAccountService';
 import { AgeGroup, AGE_GROUP_CONFIG, UserAccount } from '../../domain/models/userAccount';
 
 export interface LoginViewProps {
@@ -73,27 +73,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
   const [error, setError] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Instant login with Old Credentials
-  const handleQuickCredentialLogin = (preset: UserAccount) => {
-    setUsername(preset.username || preset.childName.toLowerCase());
-    setPassword(preset.password || 'village123');
-    setError('');
-
-    setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      UserAccountService.saveAccount(preset);
-      UserAccountService.setActiveMobile(preset.parentMobile);
-      try {
-        localStorage.setItem('untangle_logged_in', 'true');
-      } catch {
-        // ignore
-      }
-      onLogin(preset);
-    }, 250);
-  };
-
-  // Sign In Submit handler
+  // Sign In Submit handler (with multi-device cloud sync)
   const handleSignInSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -109,10 +89,9 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
     }
 
     setIsSubmitting(true);
-    setTimeout(() => {
+    UserAccountService.authenticateExplorer(trimmedUsername, password).then((authRes) => {
       setIsSubmitting(false);
 
-      const authRes = UserAccountService.authenticateExplorer(trimmedUsername, password);
       if (authRes.success && authRes.account) {
         if (rememberMe) {
           try {
@@ -123,12 +102,12 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
         }
         onLogin(authRes.account);
       } else {
-        setError(authRes.error || "That doesn't match — try Aarav, Kavi, Leo, or Mindy (secret word: village123)");
+        setError(authRes.error || 'Incorrect explorer name or secret word.');
       }
-    }, 300);
+    });
   };
 
-  // Sign Up Submit handler
+  // Sign Up Submit handler (registers & broadcasts to cloud sync across devices)
   const handleSignUpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -176,7 +155,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
   };
 
   const handleForgotHint = () => {
-    setError('Secret hint: Try one of our explorers below (e.g. Aarav, Kavi, Leo, Mindy) with secret word "village123"!');
+    setError('If you forgot your secret word, please check with your parent or plant a seed to register a new explorer profile.');
   };
 
   return (
@@ -295,7 +274,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
                 setAuthMode('signin');
                 setError('');
               }}
-              className={`flex-1 py-1 rounded-full text-xs font-bold transition-all ${
+              className={`flex-1 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 authMode === 'signin'
                   ? 'bg-amber-500 text-white shadow-xs'
                   : 'text-[#5C3D24] hover:text-black'
@@ -309,7 +288,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
                 setAuthMode('signup');
                 setError('');
               }}
-              className={`flex-1 py-1 rounded-full text-xs font-bold transition-all ${
+              className={`flex-1 py-1 rounded-full text-xs font-bold transition-all cursor-pointer ${
                 authMode === 'signup'
                   ? 'bg-amber-500 text-white shadow-xs'
                   : 'text-[#5C3D24] hover:text-black'
@@ -337,7 +316,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
             </p>
           )}
 
-          {/* ═════ TAB 1: SIGN IN (USERNAME + PASSWORD) ═════ */}
+          {/* ═════ TAB 1: SIGN IN (EXPLORER NAME + SECRET WORD) ═════ */}
           {authMode === 'signin' ? (
             <form onSubmit={handleSignInSubmit} autoComplete="off" noValidate className="flex flex-col gap-3">
               {/* Explorer name */}
@@ -348,7 +327,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
                 <input
                   id="login-username"
                   type="text"
-                  placeholder="e.g. Aarav, Kavi, Leo, Mindy"
+                  placeholder="Enter your explorer name"
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
@@ -365,7 +344,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
                 <input
                   id="login-password"
                   type="password"
-                  placeholder="•••••••• (e.g. village123)"
+                  placeholder="••••••••"
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
@@ -411,41 +390,6 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
               >
                 {isSubmitting ? '⏳ Entering…' : '🧭 Enter the Village'}
               </button>
-
-              {/* ── OLD LOGIN CREDENTIALS SECTION (Quick One-Click Test) ── */}
-              <div className="mt-2 pt-2.5 border-t-2 border-[#E7D6BA]">
-                <div className="flex items-center justify-between mb-1.5">
-                  <span className="text-[10.5px] font-extrabold uppercase tracking-wide" style={{ color: '#6E4E2E' }}>
-                    ⚡ Old Login Credentials:
-                  </span>
-                  <span className="text-[9.5px] font-semibold text-[#8B6B4A]">
-                    Key: <code className="bg-amber-100 px-1 py-0.2 rounded font-mono text-[9px]">village123</code>
-                  </span>
-                </div>
-
-                <div className="grid grid-cols-2 gap-1.5">
-                  {PRESET_ACCOUNTS.map((preset) => (
-                    <button
-                      key={preset.parentMobile}
-                      type="button"
-                      onClick={() => handleQuickCredentialLogin(preset)}
-                      className="flex items-center gap-1.5 p-1.5 rounded-xl border-2 bg-white hover:bg-amber-100/70 active:scale-95 transition-all text-left shadow-2xs cursor-pointer group"
-                      style={{ borderColor: '#3A2B18' }}
-                      title={`Sign in as ${preset.childName} (${preset.ageGroup} yrs)`}
-                    >
-                      <span className="text-base group-hover:scale-115 transition-transform">{preset.avatar}</span>
-                      <div className="truncate">
-                        <span className="text-[11px] font-black block truncate" style={{ color: '#2E3B22' }}>
-                          {preset.childName}
-                        </span>
-                        <span className="text-[8.5px] font-bold text-[#8B6B4A] block truncate">
-                          {preset.username} • {preset.language === 'ta' ? 'தமிழ்' : 'EN'}
-                        </span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
             </form>
           ) : (
             /* ═════ TAB 2: SIGN UP / REGISTER NEW EXPLORER ═════ */
@@ -457,7 +401,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Priya, Aarav, Sam"
+                  placeholder="Enter explorer name"
                   required
                   value={signUpName}
                   onChange={(e) => setSignUpName(e.target.value)}
@@ -473,7 +417,7 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLogin, onRegisterClick, 
                 </label>
                 <input
                   type="password"
-                  placeholder="e.g. village123"
+                  placeholder="••••••••"
                   required
                   value={signUpPassword}
                   onChange={(e) => setSignUpPassword(e.target.value)}

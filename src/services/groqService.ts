@@ -22,7 +22,7 @@ export interface RawGroqBatchResponse {
 
 export class GroqService {
   private static apiUrl = 'https://api.groq.com/openai/v1/chat/completions';
-  private static model = 'llama-3.1-8b-instant';
+  private static model = 'llama-3.3-70b-versatile';
   private static timeoutMs = 8000;
 
   /**

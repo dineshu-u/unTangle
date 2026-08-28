@@ -46,20 +46,60 @@ export class VoiceCloneService {
 
   /**
    * Saves recorded audio for a specific story sentence.
+   * Guaranteed to persist even if a cloned profile hasn't been calibrated yet!
    */
   public static saveSentenceAudio(storyId: string, sentenceIdx: number, base64Audio: string): void {
-    const profile = this.getActiveProfile();
-    if (!profile) return;
+    if (!base64Audio) return;
+
+    let profile = this.getActiveProfile();
+    if (!profile) {
+      profile = {
+        id: 'clone_story_' + Date.now(),
+        speaker: 'amma',
+        speakerLabelEn: 'Family Voice (Your Voice)',
+        speakerLabelTa: 'குடும்பக் குரல் (உங்கள் குரல்)',
+        recordedDate: new Date().toLocaleDateString(),
+        base64Audio: base64Audio,
+        pitch: 1.18,
+        rate: 0.88,
+        sentenceAudioMap: {},
+      };
+    }
+
     const map = profile.sentenceAudioMap || {};
     map[`${storyId}_${sentenceIdx}`] = base64Audio;
     profile.sentenceAudioMap = map;
+    if (!profile.base64Audio) {
+      profile.base64Audio = base64Audio;
+    }
     this.saveProfile(profile);
+
+    // Direct standalone fail-safe persistence in localStorage
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        window.localStorage.setItem(`untangle_dub_${storyId}_${sentenceIdx}`, base64Audio);
+      } catch {
+        // ignore
+      }
+    }
   }
 
   /**
    * Retrieves recorded audio for a specific story sentence.
+   * Checks both standalone fail-safe storage and profile map.
    */
   public static getSentenceAudio(storyId: string, sentenceIdx: number): string | null {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      try {
+        const directAudio = window.localStorage.getItem(`untangle_dub_${storyId}_${sentenceIdx}`);
+        if (directAudio && directAudio.length > 50) {
+          return directAudio;
+        }
+      } catch {
+        // ignore
+      }
+    }
+
     const profile = this.getActiveProfile();
     if (!profile || !profile.sentenceAudioMap) return null;
     return profile.sentenceAudioMap[`${storyId}_${sentenceIdx}`] || null;
@@ -69,11 +109,11 @@ export class VoiceCloneService {
    * Checks how many sentences of a story have been dubbed in the family voice.
    */
   public static getStoryDubCount(storyId: string, totalSentences: number): number {
-    const profile = this.getActiveProfile();
-    if (!profile || !profile.sentenceAudioMap) return 0;
     let count = 0;
     for (let i = 0; i < totalSentences; i++) {
-      if (profile.sentenceAudioMap[`${storyId}_${i}`]) count++;
+      if (this.getSentenceAudio(storyId, i)) {
+        count++;
+      }
     }
     return count;
   }

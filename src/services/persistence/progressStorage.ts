@@ -2,8 +2,8 @@ import { ChildProgressState } from '../../domain/models/progress';
 import { UserAccountService } from './userAccountService';
 
 export const INITIAL_PROGRESS_STATE: ChildProgressState = {
-  childId: 'child-aarav-1',
-  childName: 'Aarav',
+  childId: 'child-default-1',
+  childName: 'Explorer',
   level: 2,
   levelTitleEn: 'Sprout',
   levelTitleTa: 'முளை',

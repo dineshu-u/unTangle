@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { useApp } from '../../context/AppContext';
 import { sounds } from '../../utils/audio';
 import confetti from 'canvas-confetti';
@@ -56,13 +56,13 @@ const FAMILY_STORIES: FamilyStory[] = [
     titleTa: "வானில் ஆடும் வண்ணக் காற்றாடி",
     illustration: "🪁✨",
     sentencesEn: [
-      "Aarav held the cotton string tight as the fresh monsoon breeze touched his smiling face.",
+      "{child} held the cotton string tight as the fresh monsoon breeze touched their smiling face.",
       "The diamond kite smiled back, waving its colorful ribbons of red, gold, and sapphire blue.",
       "Higher and higher it danced above the tiled village roofs and green coconut trees.",
       "When we spell real words with care, our thoughts take flight as high as the friendly kite!"
     ],
     sentencesTa: [
-      "ஆரவ் மென்மையான நூல் உருளையை கையில் பிடித்துக் கொண்டான்; இனிய காற்று அவன் முகத்தில் வீசியது.",
+      "{child} மென்மையான நூல் உருளையை கையில் பிடித்துக் கொண்டது; இனிய காற்று முகத்தில் வீசியது.",
       "அந்த வண்ணக் காற்றாடி புன்னகைத்து, சிவப்பு, மஞ்சள், நீல வாலாட்டிகளை காற்றில் அசைத்தது.",
       "கிராமத்து ஓட்டு வீடுகளுக்கும் தென்னை மரங்களுக்கும் மேலே அது உயர உயரப் பறந்தது.",
       "நாம் சரியான சொற்களை கவனமாக எழுதும்போது, நம் எண்ணங்களும் காற்றாடி போல் உயரே பறக்கும்!"
@@ -89,7 +89,7 @@ const FAMILY_STORIES: FamilyStory[] = [
 ];
 
 export const FamilyVoiceView: React.FC = () => {
-  const { language, t, setCurrentScreen, voiceNotes, deleteVoiceNote, activePlayer } = useApp();
+  const { language, t, setCurrentScreen, voiceNotes, deleteVoiceNote, activePlayer, currentUser } = useApp();
 
   const [activeTab, setActiveTab] = useState<'listen' | 'clone' | 'record'>('listen');
   const [selectedStoryIdx, setSelectedStoryIdx] = useState(0);
@@ -128,7 +128,11 @@ export const FamilyVoiceView: React.FC = () => {
   const activeAudioElementRef = useRef<HTMLAudioElement | null>(null);
 
   const currentStory = FAMILY_STORIES[selectedStoryIdx];
-  const storySentences = language === 'ta' ? currentStory.sentencesTa : currentStory.sentencesEn;
+  const activeChildName = currentUser?.childName || activePlayer.playerName || (language === 'ta' ? 'சிறு குழந்தை' : 'The explorer');
+  const rawSentences = language === 'ta' ? currentStory.sentencesTa : currentStory.sentencesEn;
+  const storySentences = useMemo(() => {
+    return rawSentences.map((s) => s.replace(/\{child\}/g, activeChildName));
+  }, [rawSentences, activeChildName]);
   const storyTitle = language === 'ta' ? currentStory.titleTa : currentStory.titleEn;
 
   // Cleanup on unmount
@@ -225,7 +229,7 @@ export const FamilyVoiceView: React.FC = () => {
 
       // 1. Check if parent has recorded this sentence in their actual voice!
       const dubbedAudio = VoiceCloneService.getSentenceAudio(currentStory.id, idx);
-      if (dubbedAudio && selectedSpeaker === 'cloned') {
+      if (dubbedAudio) {
         const sentenceAudio = new Audio(dubbedAudio);
         activeAudioElementRef.current = sentenceAudio;
 
@@ -397,10 +401,11 @@ export const FamilyVoiceView: React.FC = () => {
       };
 
       mediaRecorder.onstop = async () => {
-        const blob = new Blob(chunks, { type: 'audio/webm' });
+        const mimeType = mediaRecorder.mimeType || 'audio/webm';
+        const blob = new Blob(chunks, { type: mimeType });
         const base64 = await VoiceCloneService.blobToBase64(blob);
 
-        // Save recorded sentence audio
+        // Save recorded sentence audio (guaranteed persistence!)
         VoiceCloneService.saveSentenceAudio(currentStory.id, teleprompterStep, base64);
         setClonedProfile(VoiceCloneService.getActiveProfile());
         setSelectedSpeaker('cloned');
@@ -414,10 +419,14 @@ export const FamilyVoiceView: React.FC = () => {
         if (teleprompterStep + 1 < storySentences.length) {
           setTeleprompterStep((prev) => prev + 1);
         } else {
-          // Completed all 4 sentences!
+          // Completed all sentences!
           sounds.playCelebration();
           confetti({ particleCount: 90, spread: 80, origin: { y: 0.6 } });
           setIsTeleprompterOpen(false);
+          // Automatically begin recital of their recorded voice story!
+          setTimeout(() => {
+            handlePlayStory();
+          }, 600);
         }
       };
 
@@ -566,8 +575,8 @@ export const FamilyVoiceView: React.FC = () => {
           {/* TAB 1: LISTEN TO STORIES (RECITES IN FAMILY VOICE WITH EMOTION!) */}
           {activeTab === 'listen' && (
             <>
-              {/* Story Selector Pills */}
-              <div className="flex gap-1.5 justify-center mb-2.5">
+              {/* Slideable Story Selector Pills (Smooth horizontal swipe on mobile) */}
+              <div className="flex gap-2 overflow-x-auto no-scrollbar py-1 px-1 mb-2.5 w-full items-center justify-start sm:justify-center">
                 {FAMILY_STORIES.map((s, idx) => (
                   <button
                     key={s.id}
@@ -576,14 +585,14 @@ export const FamilyVoiceView: React.FC = () => {
                       sounds.playTap();
                       setSelectedStoryIdx(idx);
                     }}
-                    className={`py-1 px-2.5 rounded-full text-xs font-bold transition-all flex items-center gap-1 ${
+                    className={`shrink-0 py-1.5 px-3 rounded-full text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-2xs ${
                       selectedStoryIdx === idx
-                        ? 'bg-teal-600 text-white shadow-xs scale-105'
+                        ? 'bg-teal-600 text-white shadow-xs scale-105 ring-2 ring-teal-300'
                         : 'bg-white text-teal-900 border border-teal-200 hover:bg-teal-100'
                     }`}
                   >
-                    <span>{s.illustration}</span>
-                    <span className="text-[10px] truncate max-w-[80px]">
+                    <span className="text-sm">{s.illustration}</span>
+                    <span className="text-[10px] sm:text-[11px] whitespace-nowrap">
                       {language === 'ta' ? s.titleTa : s.titleEn}
                     </span>
                   </button>
@@ -744,7 +753,7 @@ export const FamilyVoiceView: React.FC = () => {
 
                 {/* Story Sentences with Line-by-Line Highlight */}
                 <div className="space-y-2">
-                  {storySentences.map((sentence, idx) => {
+                  {storySentences.map((sentence: string, idx: number) => {
                     const isCurrent = currentSentenceIdx === idx;
                     const hasCustomDub = !!VoiceCloneService.getSentenceAudio(currentStory.id, idx);
 
@@ -765,16 +774,16 @@ export const FamilyVoiceView: React.FC = () => {
                             sounds.playTap();
                             setCurrentSentenceIdx(idx);
                             const dubbed = VoiceCloneService.getSentenceAudio(currentStory.id, idx);
-                            if (dubbed && selectedSpeaker === 'cloned') {
+                            if (dubbed) {
                               const a = new Audio(dubbed);
                               activeAudioElementRef.current = a;
-                              a.play();
+                              a.play().catch(() => {});
                             } else {
-                              sounds.speak(sentence, language, {
-                                emotion: 'storyteller',
-                                pitch: selectedSpeaker === 'cloned' ? (clonedProfile?.pitch ?? 1.2) : selectedSpeaker === 'appa' ? 0.75 : 1.25,
-                                rate: 0.85,
-                              });
+                              sounds.speakFamilyVoice(
+                                selectedSpeaker === 'appa' ? 'appa' : selectedSpeaker === 'paati' ? 'paati' : 'amma',
+                                sentence,
+                                language
+                              );
                             }
                           }}
                           className="text-xs sm:text-sm leading-relaxed cursor-pointer"
@@ -984,7 +993,7 @@ export const FamilyVoiceView: React.FC = () => {
                         <div className="flex items-center gap-2">
                           <span className="text-base">❤️</span>
                           <div>
-                            <span className="text-xs font-bold text-slate-900 block truncate max-w-[190px]">
+                            <span className="text-xs font-bold text-slate-900 block leading-snug break-words">
                               {title || speaker}
                             </span>
                             <span className="text-[9px] text-slate-400 block">
@@ -1087,7 +1096,7 @@ export const FamilyVoiceView: React.FC = () => {
 
               {/* Progress Steps */}
               <div className="flex justify-center gap-1.5 mb-3">
-                {storySentences.map((_, i) => (
+                {storySentences.map((_: string, i: number) => (
                   <div
                     key={i}
                     className={`h-2 rounded-full transition-all ${

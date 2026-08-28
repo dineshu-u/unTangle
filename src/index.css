@@ -73,35 +73,42 @@ html, body {
   flex-direction: column;
 }
 
+/* English Dyslexic Font with clean alignment (No artificial letter bloating) */
 .font-dyslexic {
   font-family: var(--font-dyslexic);
-  letter-spacing: 0.05em;
-  word-spacing: 0.1em;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  line-height: 1.45;
 }
 
-/* Tamil Dyslexia Font: UntangleTamil ONLY (Default) */
-.font-tamil-dyslexic,
-.font-tamil-dyslexic * {
+/* Tamil Dyslexia Font: UntangleTamil ONLY (No artificial bloating) */
+.font-tamil-dyslexic {
   font-family: 'UntangleTamil', 'UntangleTamil-v5-Regular', sans-serif !important;
-  letter-spacing: 0.03em;
-  word-spacing: 0.08em;
+  letter-spacing: normal !important;
+  word-spacing: normal !important;
+  line-height: 1.5;
 }
 
 /* Standard Tamil Font: Only used when explicitly turned off by parents in settings */
-.font-tamil-standard,
-.font-tamil-standard * {
+.font-tamil-standard {
   font-family: 'Noto Sans Tamil', sans-serif !important;
-  letter-spacing: 0.01em;
+  letter-spacing: normal !important;
+  line-height: 1.5;
 }
 
-.font-tamil,
-.font-tamil * {
+.font-tamil {
   font-family: 'UntangleTamil', 'UntangleTamil-v5-Regular', sans-serif !important;
-  letter-spacing: 0.02em;
+  letter-spacing: normal !important;
 }
 
 .font-child {
   font-family: var(--font-child);
+}
+
+/* Alignment Safety: Prevents premature ... ellipsis when dyslexic fonts are active */
+.font-dyslexic .truncate,
+.font-tamil-dyslexic .truncate {
+  text-overflow: clip !important;
 }
 
 /* ==========================================================================

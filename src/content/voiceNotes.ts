@@ -7,7 +7,7 @@ export const PRE_RECORDED_VOICE_NOTES: FamilyVoiceNote[] = [
     speakerTa: 'அம்மா',
     titleEn: "Mother's Encouragement",
     titleTa: "அம்மாவின் அன்பு வாழ்த்து",
-    messageEn: "Come on Aarav, you are doing wonderful! Let's explore together today!",
+    messageEn: "Come on my little champion, you are doing wonderful! Let's explore together today!",
     messageTa: "வாடா கண்ணா! ரொம்ப அழகா படிக்கிறாய்! இன்று நாம் சேர்ந்து விளையாடலாம்!",
     dateRecorded: 'Today, 9:15 AM',
     isPreRecorded: true,

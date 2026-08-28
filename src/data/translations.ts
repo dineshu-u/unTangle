@@ -64,7 +64,7 @@ export const TRANSLATIONS = {
     teachNextWord: 'Teach Mindy Next Word!',
     wordsTaughtCount: 'Words Taught',
     readAloudBtn: 'Read Aloud',
-    collectedCardsTitle: "Aarav's Collected Lesson Cards",
+    collectedCardsTitle: 'Collected Lesson Cards',
     
     // Word Kite Game
     kiteTitle: 'WORD KITE FIELD',
@@ -166,7 +166,7 @@ export const TRANSLATIONS = {
     familyVoiceScreeningNote: 'Familiar family voices reduce learning anxiety and reinforce phonetic comfort.',
 
     // Parent Experience
-    parentGardenTitle: "Aarav's Learning Garden",
+    parentGardenTitle: 'Learning Garden',
     parentSubtitle: 'Calm Progress & Screening Support',
     readingWeatherTitle: 'Reading Weather',
     weatherClearingText: 'Storm Clearing - Improvement visible',
@@ -186,7 +186,7 @@ export const TRANSLATIONS = {
     minutesLabel: 'min',
     melaReportCard: 'Mela Report card',
     melaSummaryTitle: 'Recent Festival Screening Summary',
-    melaSummarySubtitle: 'Untangle screens learning patterns through playful interactions in Word Kite and Letter Garden. Below are recent interaction observations for Aarav:',
+    melaSummarySubtitle: 'Untangle screens learning patterns through playful interactions in Word Kite and Letter Garden. Below are recent interaction observations:',
     melaSummary1: 'Strong visual recognition for consonant-vowel creature pairings.',
     melaSummary2: 'Enjoys rhythm drum taps; benefited from syllable break down.',
     melaSummary3: 'Gentle attention recommended for letter orientation and vowel endings.',
@@ -287,7 +287,7 @@ export const TRANSLATIONS = {
     teachNextWord: 'அடுத்த சொல் கற்பிக்கவும்!',
     wordsTaughtCount: 'கற்பித்த சொற்கள்',
     readAloudBtn: 'ஒலி வாசிப்பு',
-    collectedCardsTitle: 'ஆரவ்வின் பாடம் அட்டைகள்',
+    collectedCardsTitle: 'சேகரித்த பாடம் அட்டைகள்',
 
     // Word Kite Game
     kiteTitle: 'காற்றாடி மைதானம்',
@@ -389,7 +389,7 @@ export const TRANSLATIONS = {
     familyVoiceScreeningNote: 'பழக்கமான குடும்பக் குரல்கள் பயத்தை போக்கி அமைதியான கற்றலுக்கு உதவுகின்றன.',
 
     // Parent Experience
-    parentGardenTitle: 'ஆரவ்வின் கற்றல் தோட்டம்',
+    parentGardenTitle: 'கற்றல் தோட்டம்',
     parentSubtitle: 'அமைதியான முன்னேற்றம் & கவனிப்பு உதவி',
     readingWeatherTitle: 'வாசிப்பு வானிலை',
     weatherClearingText: 'புயல் விலகி வெயில் மிளிர்கிறது - முன்னேற்றம் தெரிகிறது',
@@ -409,7 +409,7 @@ export const TRANSLATIONS = {
     minutesLabel: 'நிமிடம்',
     melaReportCard: 'மேளா அறிக்கை அட்டை',
     melaSummaryTitle: 'சமீபத்திய திருவிழா மதிப்பீட்டு சுருக்கம்',
-    melaSummarySubtitle: 'காற்றாடி மற்றும் எழுத்துத் தோட்டம் விளையாட்டுகள் வழியாக ஆரவ்வின் கற்றல் அமைப்புகள் கவனிக்கப்படுகின்றன:',
+    melaSummarySubtitle: 'காற்றாடி மற்றும் எழுத்துத் தோட்டம் விளையாட்டுகள் வழியாக சமீபத்திய கற்றல் அமைப்புகள் கவனிக்கப்படுகின்றன:',
     melaSummary1: 'உயிர்மெய் எழுத்துக்கள் மற்றும் விலங்கு உருவங்களை மிக எளிதாக அடையாளம் காண்கிறார்.',
     melaSummary2: 'தாள மத்தள விளையாட்டில் நல்ல ஈடுபாடும் ஆர்வமும் காட்டுகிறார்; அசை பிரித்தல் உதவுகிறது.',
     melaSummary3: 'வடிவ ஒற்றுமை உள்ள எழுத்துக்களுக்கு (ர/ற) மென்மையான தொடர் பயிற்சி நலம் தரும்.',

@@ -42,14 +42,18 @@ export const App: React.FC = () => {
   }
 
   // Pure font isolation:
-  // Default: useDyslexicFont is true
-  //   - Tamil mode uses 'font-tamil-dyslexic' (UntangleTamil from assets, NO Noto Sans Tamil)
-  //   - English mode uses 'font-dyslexic' (OpenDyslexic)
-  // When explicitly turned off by parents in settings:
-  //   - Tamil mode uses 'font-tamil-standard' (Noto Sans Tamil)
-  //   - English mode uses 'font-child'
+  // In parent mode: clean, robust dashboard typography so parent console is always 100% visible
+  // In child mode:
+  //   - Default (useDyslexicFont: true):
+  //       * Tamil uses 'font-tamil-dyslexic' (UntangleTamil from assets)
+  //       * English uses 'font-dyslexic' (OpenDyslexic)
+  //   - When turned off by parents in settings:
+  //       * Tamil uses 'font-tamil-standard' (Noto Sans Tamil)
+  //       * English uses 'font-child' (standard font)
   const activeFontClass =
-    language === 'ta'
+    appMode === 'parent'
+      ? 'font-sans'
+      : language === 'ta'
       ? (useDyslexicFont ? 'font-tamil-dyslexic' : 'font-tamil-standard')
       : (useDyslexicFont ? 'font-dyslexic' : 'font-child');
 
@@ -89,8 +93,8 @@ export const App: React.FC = () => {
     >
       {/* Responsive Web Container with @media queries for Mobile and Tablets */}
       <div className="app-container w-full h-full h-[100dvh] max-h-[100dvh] bg-amber-50/50 flex flex-col border-amber-200/60 relative mx-auto overflow-hidden">
-        {/* Mobile Fixed Top Status Bar */}
-        <TopStatusBar onOpenParentGate={() => setIsParentGateOpen(true)} />
+        {/* Mobile Fixed Top Status Bar (Direct 1-tap Parent Dashboard access) */}
+        <TopStatusBar onOpenParentGate={() => setAppMode('parent')} />
 
         {/* Main Content Body: Takes remaining viewport space, scrolls internally if needed */}
         <main className="flex-1 min-h-0 w-full flex flex-col overflow-y-auto overflow-x-hidden">

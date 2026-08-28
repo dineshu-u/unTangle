@@ -1,4 +1,5 @@
 import { UserAccount } from '../../domain/models/userAccount';
+import { CloudSyncService } from './cloudSyncService';
 
 const ACTIVE_MOBILE_KEY = 'untangle_active_mobile';
 const ACCOUNTS_INDEX_KEY = 'untangle_accounts_index_v1';
@@ -159,11 +160,12 @@ export class UserAccountService {
 
   /**
    * Authenticates explorer using username and secret word.
+   * Supports cross-device Cloud Sync!
    */
-  public static authenticateExplorer(
+  public static async authenticateExplorer(
     username: string,
     secretWord: string
-  ): { success: boolean; account?: UserAccount; error?: string } {
+  ): Promise<{ success: boolean; account?: UserAccount; error?: string }> {
     const u = (username || '').trim().toLowerCase();
     const p = (secretWord || '').trim();
 
@@ -181,24 +183,35 @@ export class UserAccountService {
       return { success: true, account: mindyAcc };
     }
 
-    const matched = this.findAccount(u);
+    // 1. Check local storage & presets
+    let matched = this.findAccount(u);
+
+    // 2. If not found locally, pull from Cloud Sync (for cross-device access!)
+    if (!matched) {
+      const cloudAccount = await CloudSyncService.pullAccountFromCloud(u);
+      if (cloudAccount) {
+        this.saveAccount(cloudAccount);
+        matched = cloudAccount;
+      }
+    }
+
     if (!matched) {
       return {
         success: false,
-        error: "That doesn't match — try Aarav, Kavi, Leo, or Mindy (secret word: village123)",
+        error: 'Explorer not found. Please check your spelling or plant a seed to register.',
       };
     }
 
-    // Check password (default fallback: village123 or user-specific password)
+    // Check password
     const expectedPassword = matched.password || 'village123';
-    if (p === expectedPassword || p === 'village123') {
+    if (p === expectedPassword || (matched.password === undefined && p === 'village123')) {
       this.setActiveMobile(matched.parentMobile);
       return { success: true, account: matched };
     }
 
     return {
       success: false,
-      error: 'Secret word is incorrect — try village123',
+      error: 'Incorrect secret word. Please try again.',
     };
   }
 
@@ -227,6 +240,9 @@ export class UserAccountService {
           index.push(clean);
           window.localStorage.setItem(ACCOUNTS_INDEX_KEY, JSON.stringify(index));
         }
+
+        // Asynchronously broadcast to Cloud Sync for multi-device hosting!
+        CloudSyncService.pushAccountToCloud(updatedAccount).catch(() => {});
       } catch {
         // ignore
       }

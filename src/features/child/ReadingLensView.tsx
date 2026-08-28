@@ -16,12 +16,13 @@ import {
 } from 'lucide-react';
 
 export const ReadingLensView: React.FC = () => {
-  const { language, t, setCurrentScreen, contentRepo, recordLearningEvent, currentLevelWords } = useApp();
+  const { language, t, setCurrentScreen, contentRepo, recordLearningEvent, currentLevelWords, currentUser, activePlayer } = useApp();
   const baseStories = contentRepo.getStories(language);
 
   // Dynamic Story featuring active level words
   const dynamicStory = useMemo(() => {
     const isTa = language === 'ta';
+    const childName = currentUser?.childName || activePlayer.playerName || (isTa ? 'கற்பவர்' : 'Explorer');
     const words = currentLevelWords.length > 0
       ? currentLevelWords.map(w => w.word)
       : (isTa ? ['மரம்', 'பந்து', 'கப்பல்'] : ['TREE', 'BALL', 'BOAT']);
@@ -33,7 +34,7 @@ export const ReadingLensView: React.FC = () => {
       return {
         id: 'story_dyn_ta',
         language: 'ta' as const,
-        title: 'ஆரவ்வின் புதிய கிராமத்து கதை',
+        title: `${childName} புதிய கிராமத்து கதை`,
         illustration: '🌟📖',
         difficulty: 2,
         sentences: [
@@ -47,7 +48,7 @@ export const ReadingLensView: React.FC = () => {
       return {
         id: 'story_dyn_en',
         language: 'en' as const,
-        title: "Aarav's Dynamic Adventure",
+        title: `${childName}'s Dynamic Adventure`,
         illustration: '🌟📖',
         difficulty: 2,
         sentences: [
@@ -58,7 +59,7 @@ export const ReadingLensView: React.FC = () => {
         ]
       };
     }
-  }, [currentLevelWords, language]);
+  }, [currentLevelWords, language, currentUser, activePlayer]);
 
   // OCR Extracted Custom Story Card State
   const [ocrStory, setOcrStory] = useState<{
@@ -186,13 +187,20 @@ export const ReadingLensView: React.FC = () => {
 
       sounds.playCelebration();
 
+      const sourceLabel =
+        result.source === 'dual_engine_fusion'
+          ? (language === 'ta' ? 'Groq AI + OCR இரட்டை முறை' : 'Dual-Engine AI + OCR')
+          : result.source === 'groq_vision'
+          ? 'Groq AI Vision'
+          : (language === 'ta' ? 'ஆஃப்லைன் OCR' : 'Offline OCR');
+
       // Create new extracted story card
       const newCard = {
         id: `ocr_extracted_${Date.now()}`,
         title: language === 'ta' ? '📸 ஸ்கேன் செய்த புத்தகப் பக்கம்' : '📸 Scanned Book Page',
         illustration: '📖🔍',
         sentences: result.sentences,
-        source: result.source === 'groq_vision' ? 'AI Vision' : 'OCR Engine',
+        source: sourceLabel,
       };
 
       setOcrStory(newCard);

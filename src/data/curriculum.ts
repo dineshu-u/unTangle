@@ -257,13 +257,13 @@ export const READING_STORY_CARDS: ReadingStoryCard[] = [
     titleTa: "வானில் ஆடும் வண்ணக் காற்றாடி",
     illustration: "🪁✨",
     contentEn: [
-      "Aarav held the cotton string tight as the fresh breeze touched his smiling face.",
+      "The young explorer held the cotton string tight as the fresh breeze touched their smiling face.",
       "The diamond kite smiled, waving its colorful tail of red, yellow, and blue ribbons.",
       "Higher and higher it soared, dancing above the village tiled roofs and green trees.",
       "When we build real words with care, our thoughts fly high like the friendly kite!"
     ],
     contentTa: [
-      "ஆரவ் மென்மையான நூல் உருளையை கையில் பிடித்துக் கொண்டான்; இனிய காற்று அவன் முகத்தில் வீசியது.",
+      "சிறு குழந்தை மென்மையான நூல் உருளையை கையில் பிடித்துக் கொண்டது; இனிய காற்று முகத்தில் வீசியது.",
       "அந்த வண்ணக் காற்றாடி புன்னகைத்து, சிவப்பு, மஞ்சள், நீல வாலாட்டிகளை காற்றில் அசைத்தது.",
       "கிராமத்து ஓட்டு வீடுகளுக்கும் தென்னை மரங்களுக்கும் மேலே அது உயர உயரப் பறந்தது.",
       "நாம் சரியான சொற்களை கவனமாக எழுதும்போது, நம் எண்ணங்களும் காற்றாடி போல் உயரே பறக்கும்!"
@@ -278,7 +278,7 @@ export const PRE_RECORDED_VOICE_NOTES: FamilyVoiceNote[] = [
     speakerTa: 'அம்மா',
     titleEn: "Mother's Encouragement",
     titleTa: "அம்மாவின் அன்பு வாழ்த்து",
-    messageEn: "Come on Aarav, you are doing wonderful! Let's explore together today!",
+    messageEn: "Come on my little champion, you are doing wonderful! Let's explore together today!",
     messageTa: "வாடா கண்ணா! ரொம்ப அழகா படிக்கிறாய்! இன்று நாம் சேர்ந்து விளையாடலாம்!",
     dateRecorded: 'Today, 9:15 AM',
     isPreRecorded: true
