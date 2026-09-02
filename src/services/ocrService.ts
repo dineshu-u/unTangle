@@ -178,7 +178,7 @@ Extract ALL readable text from the provided image of a book page, printed card, 
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'llama-3.2-11b-vision-preview',
+        model: 'meta-llama/llama-4-scout-17b-16e-instruct',
         messages: [
           {
             role: 'user',
@@ -236,7 +236,7 @@ Return ONLY the verified final text with no quotes, formatting, or commentary.`;
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          model: 'llama-3.3-70b-versatile',
+          model: 'openai/gpt-oss-120b',
           messages: [{ role: 'user', content: prompt }],
           temperature: 0.1,
           max_tokens: 600,
